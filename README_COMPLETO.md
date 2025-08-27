@@ -46,6 +46,47 @@ vagrant up
 ```
 Esto creará las 4 VMs y las provisionará automáticamente (toma ~10-15 minutos la primera vez).
 
+```bash
+sudo tee /etc/haproxy/haproxy.cfg >/dev/null <<'HAP'
+global
+  log /dev/log local0
+  maxconn 2048
+defaults
+  log global
+  mode http
+  option httplog
+  timeout connect 5s
+  timeout client  30s
+  timeout server  30s
+  errorfile 503 /etc/haproxy/errors/503.http
+
+# Resolver: Consul DNS en 192.168.56.13:8600 (VM 'consul')
+resolvers consul
+  nameserver dns1 192.168.56.13:8600
+  accepted_payload_size 8192
+  resolve_retries 3
+  timeout retry 1s
+  hold valid 5s
+
+frontend fe_http
+  bind *:80
+  default_backend bk_web
+
+backend bk_web
+  balance roundrobin
+  option httpchk GET /health
+  # Descubre servicios 'web' registrados en Consul (usando SRV records para obtener puertos)
+  server-template web 5 _web._tcp.service.consul resolvers consul resolve-prefer ipv4 resolve-opts allow-dup-ip check
+
+listen stats
+  bind *:8404
+  stats enable
+  stats uri /haproxy?stats
+  stats auth admin:admin
+  stats refresh 5s
+HAP
+```
+
 ### 3. Verificar funcionamiento
 - **Servicio balanceado**: http://localhost:8080/
 - **HAProxy Stats**: http://localhost:8404/haproxy?stats (usuario: admin, contraseña: admin)
