@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:8080"   # cambia si tu puerto host es otro
+  phases:
+    - duration: 60    # warm-up
+      arrivalRate: 5
+    - duration: 180   # carga sostenida
+      arrivalRate: 25
+    - duration: 60    # spike
+      arrivalRate: 80
+  defaults:
+    headers:
+      Accept: "application/json"
+scenarios:
+  - name: "GET raíz"
+    flow:
+      - get:
+          url: "/"
