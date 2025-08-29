@@ -193,4 +193,4 @@ vagrant destroy -f
 - [Vagrant Documentation](https://www.vagrantup.com/docs)
 
 ## 👥 Autores
-Ivan Castillo  y Dario Narvaez - Grupo 6 - 2025
+Ivan Rodrigo Castillo Cañas 22502346 Dario Fernando Narvaez Guevara 22500268 - Grupo 6 - 2025
