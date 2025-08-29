@@ -54,6 +54,10 @@ Esto creará las 4 VMs y las provisionará automáticamente (toma ~10-15 minutos
 
 ## ✅ Validaciones
 
+### Ejecutar directamente el script de Test
+
+.\test-final.ps1
+
 ### Verificar balanceo round-robin
 ```powershell
 # PowerShell
