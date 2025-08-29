@@ -125,6 +125,14 @@ El archivo `artillery.yml` incluye 3 fases:
 - Carga sostenida: 180s a 25 req/s  
 - Spike: 60s a 80 req/s
 
+
+### Fases de la prueba
+
+- **Warm-up (60s a 5 req/s):** fase inicial que calienta el sistema y evita arranques en frío.  
+- **Carga sostenida (180s a 25 req/s):** simula el tráfico esperado en condiciones normales de uso.  
+- **Spike (60s a 80 req/s):** genera un pico repentino de solicitudes para evaluar la capacidad de respuesta ante aumentos bruscos de demanda.  
+
+
 ### Generar reporte HTML
 ```bash
 artillery run artillery.yml --output results.json
