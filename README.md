@@ -193,4 +193,4 @@ vagrant destroy -f
 - [Vagrant Documentation](https://www.vagrantup.com/docs)
 
 ## 👥 Autores
-Ivan y Dario - 2025
+Ivan Castillo  y Dario Narvaez - Grupo 6 - 2025
