@@ -23,18 +23,89 @@ const SERVICE_NAME='web';
 const SCHEME='http';
 const HOST=process.env.HOST||'127.0.0.1';
 const PORT=parseInt(process.env.PORT||'3000',10);
-const SERVICE_ID='m'+PORT;
+const SERVICE_ID='Nodoweb '+PORT;
 const PID=process.pid;
 
 const app=express();
 const consul=new Consul();
 
 app.get('/health',(req,res)=>res.end('Ok.'));
-app.get('/',(req,res)=>{
-  res.json({
-    data: Math.floor(Math.random()*89999999+10000000),
-    data_pid: PID, data_service: SERVICE_ID, data_host: HOST
-  });
+
+app.get('/', (req, res) => {
+  const data = Math.floor(Math.random()*89999999+10000000);
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Micro Proyecto 1</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+        }
+        h1 { 
+            font-size: 28px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .info-row {
+            display: flex;
+            padding: 15px;
+            background: #f7f9fc;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+            min-width: 200px;
+        }
+        .value {
+            color: #667eea;
+            font-family: monospace;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Servicio WEB Micro Proyecto 1</h1>
+        <div class="info-row">
+            <span class="label">Host IP:</span>
+            <span class="value">${HOST}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Servicio:</span>
+            <span class="value">${SERVICE_ID}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Datos obtenidos:</span>
+            <span class="value">${data}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Código de transacción:</span>
+            <span class="value">${PID}</span>
+        </div>
+    </div>
+</body>
+</html>
+  `;
+  res.send(html);
 });
 app.listen(PORT,()=>console.log(`Servicio iniciado en: ${SCHEME}://${HOST}:${PORT}!`));
 

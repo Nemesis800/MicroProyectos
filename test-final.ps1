@@ -42,32 +42,55 @@ Write-Host "  Instancias web: $services" -ForegroundColor Green
 Write-Host ""
 Write-Host "[3] Test de conectividad:" -ForegroundColor Yellow
 $test = curl.exe -s http://localhost:8080/
-if ($test) {
+if ($test -match "<h1>Servicio WEB Micro Proyecto 1</h1>") {
     Write-Host "  Servicio respondiendo: OK" -ForegroundColor Green
-    $json = $test | ConvertFrom-Json
-    Write-Host "  - Host: $($json.data_host)"
-    Write-Host "  - Service: $($json.data_service)"
+    # Extraer valores del HTML usando regex más flexible
+    $hostMatch = [regex]::Match($test, 'Host IP:</span>\s*<span class="value">([^<]+)</span>')
+    $serviceMatch = [regex]::Match($test, 'Servicio:</span>\s*<span class="value">([^<]+)</span>')
+    
+    if ($hostMatch.Success) {
+        Write-Host "  - Host: $($hostMatch.Groups[1].Value)"
+    }
+    if ($serviceMatch.Success) {
+        Write-Host "  - Service: $($serviceMatch.Groups[1].Value)"
+    }
+} elseif ($test -match "<h1>Servicio No Disponible</h1>") {
+    Write-Host "  Servicio respondiendo: ERROR 503" -ForegroundColor Red
+    Write-Host "  - No hay instancias activas"
 } else {
     Write-Host "  Servicio respondiendo: FALLA" -ForegroundColor Red
 }
 
 Write-Host ""
 Write-Host "[4] Test de balanceo:" -ForegroundColor Yellow
-Write-Host "  Realizando 6 peticiones..."
+Write-Host "  Realizando 10 peticiones..."
 $hosts = @{}
-1..6 | ForEach-Object {
-    $r = curl.exe -s http://localhost:8080/ | ConvertFrom-Json
-    $key = "$($r.data_host):$($r.data_service)"
-    if ($hosts.ContainsKey($key)) {
-        $hosts[$key] = $hosts[$key] + 1
-    } else {
-        $hosts[$key] = 1
+1..10 | ForEach-Object {
+    $response = curl.exe -s http://localhost:8080/
+    # Extraer host y servicio del HTML
+    $hostMatch = [regex]::Match($response, 'Host IP:</span>\s*<span class="value">([^<]+)</span>')
+    $serviceMatch = [regex]::Match($response, 'Servicio:</span>\s*<span class="value">([^<]+)</span>')
+    
+    if ($hostMatch.Success -and $serviceMatch.Success) {
+        $hostIP = $hostMatch.Groups[1].Value
+        $serviceID = $serviceMatch.Groups[1].Value
+        $key = "${hostIP}:${serviceID}"
+        
+        if ($hosts.ContainsKey($key)) {
+            $hosts[$key] = $hosts[$key] + 1
+        } else {
+            $hosts[$key] = 1
+        }
     }
 }
 
 Write-Host "  Distribucion:"
-foreach ($h in $hosts.GetEnumerator()) {
-    Write-Host "    $($h.Key): $($h.Value) peticiones"
+if ($hosts.Count -eq 0) {
+    Write-Host "    No se pudieron obtener respuestas válidas" -ForegroundColor Red
+} else {
+    foreach ($h in $hosts.GetEnumerator()) {
+        Write-Host "    $($h.Key): $($h.Value) peticiones"
+    }
 }
 
 Write-Host ""

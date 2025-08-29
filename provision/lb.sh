@@ -46,16 +46,89 @@ HAP
 
 mkdir -p /etc/haproxy/errors
 cat >/etc/haproxy/errors/503.http <<'EOF'
-HTTP/1.0 503 Servicio No Disponible
+HTTP/1.0 503 Service Unavailable
 Cache-Control: no-cache
 Connection: close
-Content-Type: text/html
+Content-Type: text/html; charset=utf-8
 
-<html><body style="font-family:sans-serif">
-<h2>Servicio no disponible</h2>
-<p>No hay instancias activas. Intenta mas tarde.</p>
-<p>ATT: Ivan y Dario.</p>
-</body></html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Servicio No Disponible - Micro Proyecto 1</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 { 
+            font-size: 28px;
+            color: #c0392b;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .error-icon {
+            font-size: 64px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #ffeaa7;
+            border-radius: 5px;
+            border-left: 4px solid #fdcb6e;
+        }
+        .info p {
+            margin: 10px 0;
+            color: #6c5ce7;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">⚠️</div>
+        <h1>Servicio No Disponible</h1>
+        <div class="message">
+            <p>El servicio web no está disponible en este momento.</p>
+            <p>No hay instancias activas del servicio.</p>
+        </div>
+        <div class="info">
+            <p> Por favor, intenta más tarde</p>
+            <p> Si el problema persiste, contacta al administrador</p>
+        </div>
+        <div class="footer">
+            <p>Micro Proyecto 1 </p>
+            <p> Ivan y Dario</p>
+        </div>
+    </div>
+</body>
+</html>
 EOF
 
 systemctl enable --now haproxy
