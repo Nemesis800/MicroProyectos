@@ -95,7 +95,7 @@ vagrant ssh app2 -c "sudo systemd-run --unit nodeweb-3003 /usr/bin/env HOST=192.
 ```
 
 #### Verificar en HAProxy Stats
-Abre http://localhost:8404/haproxy?stats y verás 5 servidores activos en el backend.
+Abrir http://localhost:8404/haproxy?stats y validar que existen 5 servidores activos en el backend.
 
 ### Detener réplicas
 ```powershell
@@ -105,6 +105,8 @@ vagrant ssh app1 -c "sudo systemctl stop nodeweb-3001 nodeweb-3002"
 # Detener réplica en app2
 vagrant ssh app2 -c "sudo systemctl stop nodeweb-3003"
 ```
+#### Verificar en HAProxy Stats
+Abrir http://localhost:8404/haproxy?stats y validar que existen 2 servidores activos en el backend.
 
 ## 📊 Pruebas de Carga con Artillery
 
@@ -132,20 +134,20 @@ artillery report results.json
 ## 🛠️ Solución de Problemas
 
 ### Si Consul no arranca (múltiples IPs)
-Los archivos ya incluyen la corrección, pero si modificas las IPs, asegúrate de:
+Si se modifican las IPs, se debe asegurar que:
 - `bind_addr` y `advertise_addr` usen la IP específica de cada VM
 - No usar `0.0.0.0` en bind_addr
 
 ### Si HAProxy muestra 503
-1. Verifica que Consul esté activo:
+1. Verificar que Consul esté activo:
    ```powershell
    vagrant ssh consul -c "systemctl is-active consul"
    ```
-2. Verifica que las apps estén registradas:
+2. Verificar que las apps estén registradas:
    ```powershell
    vagrant ssh consul -c "consul catalog services"
    ```
-3. Reinicia HAProxy:
+3. Reiniciar HAProxy:
    ```powershell
    vagrant ssh lb -c "sudo systemctl restart haproxy"
    ```
@@ -165,10 +167,10 @@ vagrant ssh lb -c "journalctl -u haproxy --no-pager -n 50"
 ## 📝 Cambios Importantes Aplicados
 
 ### 1. **Consul bind_addr fix**
-- Especificamos IPs explícitas en lugar de 0.0.0.0 para evitar error de múltiples interfaces
+- Se definieron IPs explícitas en lugar de 0.0.0.0 para evitar error de múltiples interfaces
 
 ### 2. **HAProxy con SRV records**
-- Usa `_web._tcp.service.consul` para obtener puertos dinámicamente
+- Se usó `_web._tcp.service.consul` para la obtención de puertos dinámicamente
 - `resolve-opts allow-dup-ip` permite múltiples servicios en la misma IP
 
 ### 3. **Health checks mejorados**
