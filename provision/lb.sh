@@ -3,7 +3,7 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y haproxy
+apt-get install -y haproxy curl
 
 cat >/etc/haproxy/haproxy.cfg <<'HAP'
 global
@@ -59,4 +59,11 @@ Content-Type: text/html
 EOF
 
 systemctl enable --now haproxy
+
+# Esperar un momento para que los otros servicios se registren en Consul por problemas en el levantamiento del proyecto cuando es nuevo
+sleep 10
+
+# Reiniciar HAProxy para asegurar que detecte los servicios en Consul
+systemctl restart haproxy
+
 echo "HAProxy listo: http://localhost:8080  |  Stats: http://localhost:8404/haproxy?stats (admin/admin)"

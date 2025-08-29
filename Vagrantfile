@@ -2,17 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # ========== LB: solo HAProxy ==========
-  config.vm.define "lb" do |lb|
-    lb.vm.box = "bento/ubuntu-22.04"
-    lb.vm.hostname = "lb"
-    lb.vm.network :private_network, ip: "192.168.56.10"
-    lb.vm.network :forwarded_port, guest: 80,   host: 8080, auto_correct: true   # HAProxy
-    lb.vm.network :forwarded_port, guest: 8404, host: 8404, auto_correct: true   # Stats GUI
-    lb.vm.provision "shell", path: "provision/lb.sh"
-  end
-
-  # ========== Consul server en VM separada ==========
+  # ========== Consul server en VM  ==========
   config.vm.define "consul" do |c|
     c.vm.box = "bento/ubuntu-22.04"
     c.vm.hostname = "consul"
@@ -35,5 +25,15 @@ Vagrant.configure("2") do |config|
     app.vm.hostname = "app2"
     app.vm.network :private_network, ip: "192.168.56.12"
     app.vm.provision "shell", path: "provision/app.sh", args: "192.168.56.12"
+  end
+
+  # ========== LB: HAProxy  ==========
+  config.vm.define "lb" do |lb|
+    lb.vm.box = "bento/ubuntu-22.04"
+    lb.vm.hostname = "lb"
+    lb.vm.network :private_network, ip: "192.168.56.10"
+    lb.vm.network :forwarded_port, guest: 80,   host: 8080, auto_correct: true   # HAProxy
+    lb.vm.network :forwarded_port, guest: 8404, host: 8404, auto_correct: true   # Stats GUI
+    lb.vm.provision "shell", path: "provision/lb.sh"
   end
 end
